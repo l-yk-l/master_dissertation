@@ -119,10 +119,13 @@ class Ui_MainWindow(object):
 
 # Класс диалогового (модального) окна для создания объектов (полностью написан руками)
 class CustomDialog(QtWidgets.QDialog):
-    def __init__(self, title):
+    def __init__(self, type):
         super().__init__()
 
-        self.setWindowTitle(title)
+        if type == 'victim':
+            self.setWindowTitle('Добавить жертву')
+        else:
+            self.setWindowTitle('Добавить охотника')
 
         # Создаем кнопки нашего окна
         dialog_buttons = QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel
@@ -136,27 +139,81 @@ class CustomDialog(QtWidgets.QDialog):
         # Вадидатор на регулярке на введение только вещественных чисел
         float_validator = QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(r'[+-]?([0-9]*[.])?[0-9]+'))
 
-        # Создаем поле ввода и вешаем на него валидатор
-        self.sinus_k_le = QtWidgets.QLineEdit(self)
-        self.sinus_k_le.setValidator(float_validator)
+        # victim = Victim(plt, self.canvas.ax, start_x=0, start_y=0, direction=30, speed=0.3, max_angle_of_rotation=45,
+        #                 angle_of_vision=30, len_of_vision=10)
+        # hunter =Hunter(plt, self.canvas.ax, start_x=-4, start_y=2, direction=-10, speed=0.5, max_angle_of_rotation=10,
+        #                  angle_of_vision=30, len_of_vision=10)
 
-        message = QtWidgets.QLabel("Add new sinusoid")
+        # Создаем поля ввода и вешаем на них валидатор
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.start_point_msg = QtWidgets.QLabel("Начальное положение (декартова система)")
+        self.start_point_msg.setFont(font)
+        self.start_x_le = QtWidgets.QLineEdit(self)
+        self.start_x_le.setValidator(float_validator)
+        self.start_y_le = QtWidgets.QLineEdit(self)
+        self.start_y_le.setValidator(float_validator)
+
+        self.vector_msg = QtWidgets.QLabel("Скорость и направление (полярная система)")
+        self.vector_msg.setFont(font)
+        self.speed_le = QtWidgets.QLineEdit(self)
+        self.speed_le.setValidator(float_validator)
+        self.direction_le = QtWidgets.QLineEdit(self)
+        self.direction_le.setValidator(float_validator)
+
+        self.rotation_msg = QtWidgets.QLabel("Максимальный угол поворота")
+        self.rotation_msg.setFont(font)
+        self.max_angle_of_rotation_le = QtWidgets.QLineEdit(self)
+        self.max_angle_of_rotation_le.setValidator(float_validator)
+
+        self.vision_msg = QtWidgets.QLabel("Конус визирования (полярная система)")
+        self.vision_msg.setFont(font)
+        self.angle_of_vision_le = QtWidgets.QLineEdit(self)
+        self.angle_of_vision_le.setValidator(float_validator)
+        self.len_of_vision_le = QtWidgets.QLineEdit(self)
+        self.len_of_vision_le.setValidator(float_validator)
 
         # Собираем наше окно из созданных фрагментов
         self.layout = QtWidgets.QFormLayout()
-        self.layout.addRow(message)
-        self.layout.addRow("Enter k for your sinusoid", self.sinus_k_le)
+
+        self.layout.addRow(self.start_point_msg)
+        self.layout.addRow("X: ", self.start_x_le)
+        self.layout.addRow("Y: ", self.start_y_le)
+
+        self.layout.addRow(self.vector_msg)
+        self.layout.addRow("Скорость (0-1): ", self.speed_le)
+        self.layout.addRow("Направление°: ", self.direction_le)
+
+        self.layout.addRow(self.rotation_msg)
+        self.layout.addRow("Макс. ° поворота: ", self.max_angle_of_rotation_le)
+
+        self.layout.addRow(self.vision_msg)
+        self.layout.addRow("Угол сектора: ", self.angle_of_vision_le)
+        self.layout.addRow("Радиус окружности: ", self.len_of_vision_le)
+
         self.layout.addRow(self.buttonBox)
         self.setLayout(self.layout)
 
         # Объявляем атрибуты которые будем получать из модалки
-        self.status = 'zhopa'
-        self.sinus_k = ''
+        self.status = None
+        self.start_x = None
+        self.start_y = None
+        self.direction = None
+        self.speed = None
+        self.max_angle_of_rotation = None
+        self.angle_of_vision = None
+        self.len_of_vision = None
 
     # Данная функция отрабатывает при нажатии на кнопку Ок и инициализирует атрибуты, объявленные в конструкторе
     def custom_accept(self):
         self.status = '+'
-        self.sinus_k = self.sinus_k_le.text()
+        self.start_x = float(self.start_x_le.text())
+        self.start_y = float(self.start_y_le.text())
+        self.direction = float(self.direction_le.text())
+        self.speed = float(self.speed_le.text())
+        self.max_angle_of_rotation = float(self.max_angle_of_rotation_le.text())
+        self.angle_of_vision = float(self.angle_of_vision_le.text())
+        self.len_of_vision = float(self.len_of_vision_le.text())
         self.accept()
 
     # Данная функция отрабатывает при нажатии на кнопку Отмена. Пока она бесполезна, но пусть пока живет (мало ли чо)

@@ -16,6 +16,9 @@ class MainWindow(QMainWindow):
         # Массивы охотников и жертв
         self.hunters = []
         self.victims = []
+        # Массивы лейблов охотников и жертв
+        self.hunter_lbls = []
+        self.victim_lbls = []
         # Привязываем методы добавления объектов к кнопкам
         self.ui.addHunterBtn.clicked.connect(self.add_hunter)
         self.ui.addVictimBtn.clicked.connect(self.add_victim)
@@ -65,39 +68,53 @@ class MainWindow(QMainWindow):
 
     def add_hunter(self):
         if len(self.hunters) < 11:
-            hunter = (self.hunters[-1] + 1) if len(self.hunters) else 1
-            self.hunters.append(hunter)
-            m = hunter
-            self.create_new_label(0, m, str(hunter))
+            dlg = CustomDialog('hunter')
+            if dlg.exec():
+                v_start_x = dlg.start_x
+                v_start_y = dlg.start_y
+                v_direction = dlg.direction
+                v_speed = dlg.speed
+                v_max_angle_of_rotation = dlg.max_angle_of_rotation
+                v_angle_of_vision = dlg.angle_of_vision
+                v_len_of_vision = dlg.len_of_vision
 
-            for i in range(len(self.victims)):
-                self.create_new_checkbox(i + 1, m)
+                hunter = self.ui.canvas.add_object('hunter', v_start_x, v_start_y, v_direction, v_speed,
+                                                   v_max_angle_of_rotation,
+                                                   v_angle_of_vision, v_len_of_vision)
+                self.hunters.append(hunter)
+
+                hunter_lbl = (self.hunter_lbls[-1] + 1) if len(self.hunter_lbls) else 1
+                self.hunter_lbls.append(hunter_lbl)
+                m = hunter_lbl
+                self.create_new_label(0, m, str(hunter_lbl))
+
+                for i in range(len(self.victims)):
+                    self.create_new_checkbox(i + 1, m)
         else:
             QtWidgets.QMessageBox().critical(self, "Ошибка", 'Создано максимальное количество объектов "Охотник"',
                                              QtWidgets.QMessageBox.StandardButton.Ok)
 
     def add_victim(self):
-        # global tmp
-        #
-        # if tmp == 0:
-        #     self.ui.canvas.add_object(1)
-        #     tmp += 1
-        # elif tmp == 1:
-        #     self.ui.canvas.add_object(0.5)
-        #     tmp += 1
-        # else:
-        #     self.ui.canvas.add_object(0.1)
-
         if len(self.victims) < 11:
-            dlg = CustomDialog('Добавить жертву')
+            dlg = CustomDialog('victim')
             if dlg.exec():
-                k = float(dlg.sinus_k)
-                self.ui.canvas.add_object(k)
+                v_start_x = dlg.start_x
+                v_start_y = dlg.start_y
+                v_direction = dlg.direction
+                v_speed = dlg.speed
+                v_max_angle_of_rotation = dlg.max_angle_of_rotation
+                v_angle_of_vision = dlg.angle_of_vision
+                v_len_of_vision = dlg.len_of_vision
 
-                victim = chr(ord(self.victims[-1]) + 1) if len(self.victims) else 'A'
+                victim = self.ui.canvas.add_object('victim', v_start_x, v_start_y, v_direction, v_speed,
+                                                   v_max_angle_of_rotation,
+                                                   v_angle_of_vision, v_len_of_vision)
                 self.victims.append(victim)
-                n = (ord(victim) - ord('A')) + 1
-                self.create_new_label(n, 0, victim)
+
+                victim_lbl = chr(ord(self.victim_lbls[-1]) + 1) if len(self.victim_lbls) else 'A'
+                self.victim_lbls.append(victim_lbl)
+                n = (ord(victim_lbl) - ord('A')) + 1
+                self.create_new_label(n, 0, victim_lbl)
 
                 for i in range(len(self.hunters)):
                     self.create_new_checkbox(n, i + 1)

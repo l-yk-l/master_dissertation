@@ -54,6 +54,7 @@ class Sinusoid(object):
         self.color = color
         self.line.set_color(self.color)
 
+
 class Victim(object):
     def __init__(self, plt, ax, start_x, start_y, direction, speed, max_angle_of_rotation, angle_of_vision, len_of_vision, n_points=500):
         self.n_points = n_points
@@ -164,11 +165,10 @@ class Victim(object):
             np.radians(180+self.direction + (self.angle_of_vision / 2)))
         self.vision_right_border_y = self.y[-1] + self.len_of_vision * np.sin(
             np.radians(180+self.direction + (self.angle_of_vision / 2)))
-
-        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, self.len_of_vision * 3))
-        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, self.len_of_vision * 3))
-        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, self.len_of_vision * 3))
-        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, self.len_of_vision * 3))
+        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision) * 3))
+        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision) * 3))
+        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision) * 3))
+        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision) * 3))
 
     # return bool
     # Видит ли жертва охотника
@@ -316,10 +316,10 @@ class Hunter(object):
         self.vision_right_border_x = self.x[-1] + self.len_of_vision * np.cos(np.radians(self.direction + (self.angle_of_vision / 2)))
         self.vision_right_border_y = self.y[-1] + self.len_of_vision * np.sin(np.radians(self.direction + (self.angle_of_vision / 2)))
 
-        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, self.len_of_vision*3))
-        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, self.len_of_vision*3))
-        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, self.len_of_vision*3))
-        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, self.len_of_vision*3))
+        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision)*3))
+        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision)*3))
+        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision)*3))
+        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision)*3))
 
     # return bool
     # Видит ли охотник жертву

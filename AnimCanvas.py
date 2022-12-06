@@ -69,21 +69,21 @@ class AnimationWidget(QtWidgets.QWidget):
         self.add_object(1)
         self.objects[0].line.remove()
 
-        victim = Victim(plt, self.canvas.ax, start_x=0, start_y=0, direction=30, speed=0.3, max_angle_of_rotation=45,
-                        angle_of_vision=30, len_of_vision=10)
-        hunter1 = Hunter(plt, self.canvas.ax, start_x=-4, start_y=2, direction=-10, speed=0.5, max_angle_of_rotation=10,
-                         angle_of_vision=30, len_of_vision=10)
-
-        victim.add_hunter(hunter1)
-        hunter1.set_victim(victim)
-
-        self.objects.append(victim)
-        self.objects.append(hunter1)
-
-        gen1 = victim.data_gen()
-        self.animations.append(FuncAnimation(self.canvas.figure, victim.update, gen1, interval=20, blit=False))
-        gen2 = hunter1.data_gen()
-        self.animations.append(FuncAnimation(self.canvas.figure, hunter1.update, gen2, interval=20, blit=False))
+        # victim = Victim(plt, self.canvas.ax, start_x=0, start_y=0, direction=30, speed=0.3, max_angle_of_rotation=45,
+        #                 angle_of_vision=30, len_of_vision=10)
+        # hunter =Hunter(plt, self.canvas.ax, start_x=-4, start_y=2, direction=-10, speed=0.5, max_angle_of_rotation=10,
+        #                  angle_of_vision=30, len_of_vision=10)
+        #
+        # victim.add_hunter(hunter1)
+        # hunter1.set_victim(victim)
+        #
+        # self.objects.append(victim)
+        # self.objects.append(hunter1)
+        #
+        # gen1 = victim.data_gen()
+        # self.animations.append(FuncAnimation(self.canvas.figure, victim.update, gen1, interval=20, blit=False))
+        # gen2 = hunter1.data_gen()
+        # self.animations.append(FuncAnimation(self.canvas.figure, hunter1.update, gen2, interval=20, blit=False))
 
     # Данная функция выполняется при нажатии на кнопку "Старт"
     # Переводит атрибут текущего класса и каждого объекта из self.objects isPaused в значение False
@@ -103,12 +103,27 @@ class AnimationWidget(QtWidgets.QWidget):
 
     # Данный метод вызывается при создании новых объектов анимации из main.py
     # Создает новый объект и добавляет необходимые значения в self.objects и self.animations
-    def add_object(self, params):
-        s = Sinusoid(plt, self.canvas.ax, params)
-        gen = s.data_gen()
-        anim = FuncAnimation(self.canvas.figure, s.update, gen, interval=20, blit=False)
-        s.isPaused = self.isPaused
-        self.objects.append(s)
+    def add_object(self, plane_type, v_start_x=0, v_start_y=0, v_direction=0, v_speed=0.5,
+                   v_max_angle_of_rotation=10,
+                   v_angle_of_vision=0, v_len_of_vision=0):
+
+        if plane_type == 'victim':
+            obj = Victim(plt, self.canvas.ax, start_x=v_start_x, start_y=v_start_y, direction=v_direction,
+                         speed=v_speed,
+                         max_angle_of_rotation=v_max_angle_of_rotation,
+                         angle_of_vision=v_angle_of_vision, len_of_vision=v_len_of_vision)
+        elif plane_type == 'hunter':
+            obj = Hunter(plt, self.canvas.ax, start_x=v_start_x, start_y=v_start_y, direction=v_direction,
+                         speed=v_speed,
+                         max_angle_of_rotation=v_max_angle_of_rotation,
+                         angle_of_vision=v_angle_of_vision, len_of_vision=v_len_of_vision)
+        else:
+            obj = Sinusoid(plt, self.canvas.ax, 1)
+
+        gen = obj.data_gen()
+        anim = FuncAnimation(self.canvas.figure, obj.update, gen, interval=20, blit=False)
+        obj.isPaused = self.isPaused
+        self.objects.append(obj)
         self.animations.append(anim)
 
 
