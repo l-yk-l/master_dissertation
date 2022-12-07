@@ -127,4 +127,28 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
+
+    #
+    victim = w.ui.canvas.add_object('victim', v_start_x=0, v_start_y=0, v_direction=30, v_speed=0.3,
+                                    v_max_angle_of_rotation=45, v_angle_of_vision=30, v_len_of_vision=10)
+    w.victims.append(victim)
+
+    victim_lbl = chr(ord(w.victim_lbls[-1]) + 1) if len(w.victim_lbls) else 'A'
+    w.victim_lbls.append(victim_lbl)
+    n = (ord(victim_lbl) - ord('A')) + 1
+    w.create_new_label(n, 0, victim_lbl)
+
+    #
+    hunter = w.ui.canvas.add_object('hunter', v_start_x=-4, v_start_y=2, v_direction=-10, v_speed=0.5,
+                                    v_max_angle_of_rotation=10, v_angle_of_vision=30, v_len_of_vision=10)
+    w.hunters.append(hunter)
+
+    hunter_lbl = (w.hunter_lbls[-1] + 1) if len(w.hunter_lbls) else 1
+    w.hunter_lbls.append(hunter_lbl)
+    m = hunter_lbl
+    w.create_new_label(0, m, str(hunter_lbl))
+
+    for i in range(len(w.victims)):
+        w.create_new_checkbox(i + 1, m)
+
     app.exec()

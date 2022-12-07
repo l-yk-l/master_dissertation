@@ -44,14 +44,18 @@ class AnimationWidget(QtWidgets.QWidget):
         hbox = QtWidgets.QHBoxLayout()
         self.start_button = QtWidgets.QPushButton("Старт", self)
         self.stop_button = QtWidgets.QPushButton("Пауза", self)
+        self.gif_button = QtWidgets.QPushButton("Сохранить", self)
         self.start_button.clicked.connect(self.on_start)
         self.stop_button.clicked.connect(self.on_stop)
+        self.gif_button.clicked.connect(self.on_save)
         font = QtGui.QFont()
         font.setPointSize(12)
         self.start_button.setFont(font)
         self.stop_button.setFont(font)
+        self.gif_button.setFont(font)
         hbox.addWidget(self.start_button)
         hbox.addWidget(self.stop_button)
+        hbox.addWidget(self.gif_button)
 
         # Окончательно собираем интерфейс
         vbox.addLayout(hbox)
@@ -101,6 +105,9 @@ class AnimationWidget(QtWidgets.QWidget):
         for item in self.objects:
             item.isPaused = True
 
+    def on_save(self):
+        print('aboba')
+
     # Данный метод вызывается при создании новых объектов анимации из main.py
     # Создает новый объект и добавляет необходимые значения в self.objects и self.animations
     def add_object(self, plane_type, v_start_x=0, v_start_y=0, v_direction=0, v_speed=0.5,
@@ -125,6 +132,8 @@ class AnimationWidget(QtWidgets.QWidget):
         obj.isPaused = self.isPaused
         self.objects.append(obj)
         self.animations.append(anim)
+
+        return obj
 
 
 # Реликт для проверки работы виджета
