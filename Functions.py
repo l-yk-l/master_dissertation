@@ -22,29 +22,51 @@ class Sinusoid(object):
         self.plt = plt
         [self.line] = self.ax.step(self.x, self.y)
         self.color = None
-        # self.plt.xlim([-10.6, 10.6])
-        # self.plt.ylim([-5.2, 5.2])
+        self.plt.xlim([-10.6, 10.6])
+        self.plt.ylim([-10.6, 10.6])
+        self.objects = []
 
     def update(self, dy):
-        last = self.x[-1]
+        # pass
+        # last = self.x[-1]
         if not self.isPaused:
-            self.x.append(last + self.e)  # update data
-            self.y.append(dy)
-            self.x_history.append(last + self.e)
-            self.y_history.append(dy)
-
-            self.line.set_xdata(self.x)  # update plot data
-            self.line.set_ydata(self.y)
-
-            # лимиты осей (с какой по какую точку оси отображать плот)
-            if last < 10:
-                self.plt.xlim([-0.6, 10.6])
+            if len(self.objects) >= 1:
+                obj = self.objects[0]
+                # print(obj.x)
+                mn_x = min(obj.x)
+                mx_x = max(obj.x)
+                mn_y = min(obj.y)
+                mx_y = max(obj.y)
+                for i in range(1, len(self.objects)):
+                    obj = self.objects[i]
+                    mn_x = min(mn_x, min(obj.x))
+                    mx_x = max(mx_x, max(obj.x))
+                    mn_y = min(mn_y, min(obj.y))
+                    mx_y = max(mx_y, max(obj.y))
+                x_perc = (mx_x - mn_x) / 10
+                y_perc = (mx_y - mn_y) / 10
+                self.plt.xlim([mn_x - x_perc, mx_x + x_perc])
+                self.plt.ylim([mn_y - y_perc, mx_y + y_perc])
             else:
-                self.plt.xlim([last - 10.6, last + 0.6])
-            self.plt.ylim([-1.2, 1.2])
-            self.ax.autoscale_view(True, True, True)
-
-            return self.line, self.ax
+                self.plt.xlim([-10.6, 10.6])
+                self.plt.ylim([-10.6, 10.6])
+        #     self.x.append(last + self.e)  # update data
+        #     self.y.append(dy)
+        #     self.x_history.append(last + self.e)
+        #     self.y_history.append(dy)
+        #
+        #     self.line.set_xdata(self.x)  # update plot data
+        #     self.line.set_ydata(self.y)
+        #
+        #     # лимиты осей (с какой по какую точку оси отображать плот)
+        #     # if last < 10:
+        #     #     self.plt.xlim([-0.6, 10.6])
+        #     # else:
+        #     #     self.plt.xlim([last - 10.6, last + 0.6])
+        #     # self.plt.ylim([-1.2, 1.2])
+        #     self.ax.autoscale_view(True, True, True)
+        #
+        #     return self.line, self.ax
 
     def data_gen(self):
         while True:
@@ -85,9 +107,9 @@ class Victim(object):
         self.right_border.set_color('green')
         self.draw_vision()
         self.color = None
-
-        self.plt.xlim([self.x[-1]-10, self.x[-1]+10])
-        self.plt.ylim([self.y[-1]-10, self.y[-1]+10])
+        #
+        # self.plt.xlim([self.x[-1]-10, self.x[-1]+10])
+        # self.plt.ylim([self.y[-1]-10, self.y[-1]+10])
 
     def update(self, dy):
         # A(x1, y1)
@@ -165,10 +187,10 @@ class Victim(object):
             np.radians(180+self.direction + (self.angle_of_vision / 2)))
         self.vision_right_border_y = self.y[-1] + self.len_of_vision * np.sin(
             np.radians(180+self.direction + (self.angle_of_vision / 2)))
-        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision) * 3))
-        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision) * 3))
-        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision) * 3))
-        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision) * 3))
+        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision) * 6))
+        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision) * 6))
+        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision) * 6))
+        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision) * 6))
 
     # return bool
     # Видит ли жертва охотника
@@ -215,13 +237,13 @@ class Victim(object):
         min_y_lim = min(self.y)
         max_x_lim = max(self.x)
         max_y_lim = max(self.y)
-        for hunter in self.hunters:
-            min_x_lim = min(min_x_lim, min(hunter.x))
-            min_y_lim = min(min_y_lim, min(hunter.y))
-            max_x_lim = max(max_x_lim, max(hunter.x))
-            max_y_lim = max(max_y_lim, max(hunter.y))
-        self.plt.xlim([min_x_lim-10, max_x_lim+10])
-        self.plt.ylim([min_y_lim - 10, max_y_lim + 10])
+        # for hunter in self.hunters:
+        #     min_x_lim = min(min_x_lim, min(hunter.x))
+        #     min_y_lim = min(min_y_lim, min(hunter.y))
+        #     max_x_lim = max(max_x_lim, max(hunter.x))
+        #     max_y_lim = max(max_y_lim, max(hunter.y))
+        # self.plt.xlim([min_x_lim-10, max_x_lim+10])
+        # self.plt.ylim([min_y_lim - 10, max_y_lim + 10])
 
     def data_gen(self):
         while True:
@@ -316,10 +338,10 @@ class Hunter(object):
         self.vision_right_border_x = self.x[-1] + self.len_of_vision * np.cos(np.radians(self.direction + (self.angle_of_vision / 2)))
         self.vision_right_border_y = self.y[-1] + self.len_of_vision * np.sin(np.radians(self.direction + (self.angle_of_vision / 2)))
 
-        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision)*3))
-        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision)*3))
-        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision)*3))
-        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision)*3))
+        self.left_border.set_xdata(np.linspace(self.x[-1], self.vision_left_border_x, math.ceil(self.len_of_vision)*6))
+        self.left_border.set_ydata(np.linspace(self.y[-1], self.vision_left_border_y, math.ceil(self.len_of_vision)*6))
+        self.right_border.set_xdata(np.linspace(self.x[-1], self.vision_right_border_x, math.ceil(self.len_of_vision)*6))
+        self.right_border.set_ydata(np.linspace(self.y[-1], self.vision_right_border_y, math.ceil(self.len_of_vision)*6))
 
     # return bool
     # Видит ли охотник жертву
