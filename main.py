@@ -32,6 +32,15 @@ class MainWindow(QMainWindow):
         # Получаем данные с чекбокса (его положение и значение)
         checkbox = self.findChild(QtWidgets.QCheckBox, f"checkBox_{row}_{col}")
         state = checkbox.isChecked()
+        victim_ind = row - 1
+        hunter_ind = col - 1
+        if state:
+            self.hunters[hunter_ind].add_victim(self.victims[victim_ind])
+            self.victims[victim_ind].add_hunter(self.hunters[hunter_ind])
+        else:
+            self.hunters[hunter_ind].remove_victim(self.victims[victim_ind])
+            self.victims[victim_ind].remove_hunter(self.hunters[hunter_ind])
+        # print(f"{row} - {col} = {state}")
         # ------------------------------------------------
         # Some code to attach/detach Hunter to/from Victim
         # ------------------------------------------------

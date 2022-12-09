@@ -256,6 +256,11 @@ class Victim(object):
     def add_hunter(self, hunter):
         self.hunters.append(hunter)
 
+    def remove_hunter(self, hunter):
+        if hunter in self.hunters:
+            ind = self.hunters.index(hunter)
+            self.hunters = self.hunters[:ind] + self.hunters[ind+1:]
+
 
 class Hunter(object):
     def __init__(self, plt, ax, start_x, start_y, direction, speed, max_angle_of_rotation, angle_of_vision, len_of_vision, n_points=500):
@@ -270,7 +275,7 @@ class Hunter(object):
         self.y = deque(npy, maxlen=n_points)
         self.x_history = [self.x[0], self.x[1]]
         self.y_history = [self.y[0], self.y[1]]
-        self.victim = None
+        self.victims = []
         self.isPaused = True
         self.ax = ax
         self.plt = plt
@@ -294,26 +299,34 @@ class Hunter(object):
         # d - расстояние
         # B = (x1 + d*cos(a), y1 + d*sin(a))
         if not self.isPaused:
-            # Расчет угла поворота
-            if self.victim and self.view_victim():
-                s_x = self.victim.x[-1] - self.x[-1]
-                s_y = self.victim.y[-1] - self.y[-1]
-                sin_fi = np.cos(np.radians(self.direction))
-                cos_fi = np.sin(np.radians(self.direction))
+            if len(self.victims):
+                victim = self.victims[0]
+                mn_range = get_distance(self.x[-1], self.y[-1], victim.x[-1], victim.y[-1])
+                for obj in self.victims:
+                    cur_range = get_distance(self.x[-1], self.y[-1], obj.x[-1], obj.y[-1])
+                    if cur_range < mn_range:
+                        mn_range = cur_range
+                        victim = obj
+                # Расчет угла поворота
+                if self.view_victim(victim):
+                    s_x = victim.x[-1] - self.x[-1]
+                    s_y = victim.y[-1] - self.y[-1]
+                    sin_fi = np.cos(np.radians(self.direction))
+                    cos_fi = np.sin(np.radians(self.direction))
 
-                local_victim_x = s_x * sin_fi + s_y * cos_fi
-                local_victim_y = -s_x * cos_fi + s_y * sin_fi
-                # print(f"x = {local_victim_x}; y = {local_victim_y}")
-                angle_to_victim = 0
-                if local_victim_x:
-                    angle_to_victim = np.degrees(np.arctan(local_victim_y / local_victim_x))
-                else:
-                    angle_to_victim = np.sign(local_victim_y) * 90.0
+                    local_victim_x = s_x * sin_fi + s_y * cos_fi
+                    local_victim_y = -s_x * cos_fi + s_y * sin_fi
+                    # print(f"x = {local_victim_x}; y = {local_victim_y}")
+                    angle_to_victim = 0
+                    if local_victim_x:
+                        angle_to_victim = np.degrees(np.arctan(local_victim_y / local_victim_x))
+                    else:
+                        angle_to_victim = np.sign(local_victim_y) * 90.0
 
-                if local_victim_y > 0:
-                    self.direction += min(self.max_angle_of_rotation, abs(angle_to_victim))
-                else:
-                    self.direction -= min(self.max_angle_of_rotation, abs(angle_to_victim))
+                    if local_victim_y > 0:
+                        self.direction += min(self.max_angle_of_rotation, abs(angle_to_victim))
+                    else:
+                        self.direction -= min(self.max_angle_of_rotation, abs(angle_to_victim))
 
             for i in range(10):
                 last_x = self.x[-1]
@@ -352,15 +365,15 @@ class Hunter(object):
     # если sign(t1) == sign(t2) == sign(t3) - точка внутри треугольника
     # если t1 == 0 or t2 == 0 or t3 == 0 - точка на границе треугольника
     # иначе точка вне треугольника
-    def view_victim(self):
+    def view_victim(self, victim):
         x1 = self.x[-1]
         y1 = self.y[-1]
         x2 = self.vision_left_border_x
         y2 = self.vision_left_border_y
         x3 = self.vision_right_border_x
         y3 = self.vision_right_border_y
-        x0 = self.victim.x[-1]
-        y0 = self.victim.y[-1]
+        x0 = victim.x[-1]
+        y0 = victim.y[-1]
 
         t1 = np.sign((x1 - x0) * (y2 - y1) - (x2 - x1) * (y1 - y0))
         t2 = np.sign((x2 - x0) * (y3 - y2) - (x3 - x2) * (y2 - y0))
@@ -382,5 +395,10 @@ class Hunter(object):
         self.color = color
         self.line.set_color(self.color)
 
-    def set_victim(self, victim):
-        self.victim = victim
+    def add_victim(self, victim):
+        self.victims.append(victim)
+
+    def remove_victim(self, victim):
+        if victim in self.victims:
+            ind = self.victims.index(victim)
+            self.victims = self.victims[:ind] + self.victims[ind+1:]
