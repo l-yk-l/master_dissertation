@@ -79,6 +79,7 @@ class Sinusoid(object):
 
 class Victim(object):
     def __init__(self, plt, ax, start_x, start_y, direction, speed, max_angle_of_rotation, angle_of_vision, len_of_vision, n_points=500):
+        self.type = "victim"
         self.n_points = n_points
         self.e = 10 / n_points
         self.direction = direction
@@ -264,6 +265,7 @@ class Victim(object):
 
 class Hunter(object):
     def __init__(self, plt, ax, start_x, start_y, direction, speed, max_angle_of_rotation, angle_of_vision, len_of_vision, n_points=500):
+        self.type = "hunter"
         self.n_points = n_points
         self.e = 10 / n_points
         self.direction = direction

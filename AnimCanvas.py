@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.animation import FuncAnimation
 
 from Functions import *
+from gif_drawer import draw_history
 
 
 # Кастомный канвас для виджета отображения графиков (наследник канваса мпл)
@@ -34,6 +35,11 @@ class AnimationWidget(QtWidgets.QWidget):
         # Вызываем констрктор класса предка, чтобы он выполнил все необходимые методы PyQt6
         QtWidgets.QWidget.__init__(self)
 
+        # Массив отображаемых на полотне объектов
+        self.objects = []
+        # Массив анимаций (FuncAnimation) задаваемых нашими объектами
+        self.animations = []
+
         # Верстаем интерфейс виджета, он состоит из 2 блоков - vbox и hbox
         # vbox содержит наше полотно, класс которого описан выше
         vbox = QtWidgets.QVBoxLayout()
@@ -47,7 +53,7 @@ class AnimationWidget(QtWidgets.QWidget):
         self.gif_button = QtWidgets.QPushButton("Сохранить", self)
         self.start_button.clicked.connect(self.on_start)
         self.stop_button.clicked.connect(self.on_stop)
-        self.gif_button.clicked.connect(self.on_save)
+        self.gif_button.clicked.connect(lambda: draw_history(self.objects[1:]))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.start_button.setFont(font)
@@ -64,10 +70,6 @@ class AnimationWidget(QtWidgets.QWidget):
         # При запуске программы полотно изначально стоит на паузе
         self.isPaused = True
 
-        # Массив отображаемых на полотне объектов
-        self.objects = []
-        # Массив анимаций (FuncAnimation) задаваемых нашими объектами
-        self.animations = []
         # При инициализации виджета создаем один отображаемый объект и сразу удаляем его линию
         # Костыль конечно, но иначе не хочет работать (вернее добавлять новые объекты динамически)
         self.add_object(1)
@@ -89,9 +91,6 @@ class AnimationWidget(QtWidgets.QWidget):
         for item in self.objects:
             item.isPaused = True
 
-    def on_save(self):
-        print('aboba')
-
     # Данный метод вызывается при создании новых объектов анимации из main.py
     # Создает новый объект и добавляет необходимые значения в self.objects и self.animations
     def add_object(self, plane_type, v_start_x=0, v_start_y=0, v_direction=0, v_speed=0.5,
@@ -112,7 +111,7 @@ class AnimationWidget(QtWidgets.QWidget):
             obj = Sinusoid(plt, self.canvas.ax, 1)
 
         gen = obj.data_gen()
-        anim = FuncAnimation(self.canvas.figure, obj.update, gen, interval=20, blit=False)
+        anim = FuncAnimation(self.canvas.figure, obj.update, gen, interval=5, blit=False)
         obj.isPaused = self.isPaused
         self.objects.append(obj)
         self.animations.append(anim)
